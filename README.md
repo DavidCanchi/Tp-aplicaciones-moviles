@@ -12,13 +12,95 @@
 
 ## 🚀 Cómo ejecutar la app
 
-### Requisitos previos
+### Versiones utilizadas en este proyecto
 
-- Node.js 18+
-- npm o yarn
-- Expo Go instalado en el celular (iOS o Android) — descargalo desde la App Store / Play Store
+- Node.js: 18.x o más reciente
+- npm: 10.x (o la versión que viene con Node 18+)
+- Expo SDK: ~50.0.0
+- React Native: 0.73.6
+- Expo Notifications: ~0.27.0
 
-### Pasos
+> Si usas una versión distinta de Node o npm, puede funcionar, pero lo recomendado para este proyecto es Node 18.x.
+
+---
+
+## 🧩 Requisitos previos
+
+### Para Windows
+
+1. Instalar Node.js 18.x desde https://nodejs.org/
+2. Verificar que `npm` funciona desde PowerShell o CMD:
+   ```powershell
+   node -v
+   npm -v
+   ```
+3. Instalar Expo CLI globalmente (opcional, también se puede usar `npx`):
+   ```powershell
+   npm install -g expo-cli
+   ```
+4. Descargar Expo Go en el celular desde Google Play o App Store.
+5. Si quieres usar emulador Android, instala Android Studio y configura un AVD.
+   - Usa un emulador Pixel 5 con Android 14 (API 34).
+   - No instales un emulador demasiado reciente, ya que puede dar problemas de compatibilidad.
+
+#### Script sugerido para Windows
+
+Crea un archivo `setup-windows.ps1` con este contenido y ejecútalo desde PowerShell como administrador:
+
+```powershell
+# setup-windows.ps1
+Write-Host "Instalando dependencias para TaskMaster..."
+
+choco install nodejs-lts -y
+npm install -g expo-cli
+npm install
+Write-Host "Listo. Ejecuta 'npx expo start' para iniciar la app."
+```
+
+> Si no tienes Chocolatey, instala Node.js manualmente desde https://nodejs.org/.
+
+### Para Linux
+
+1. Instalar Node.js 18.x.
+2. Verificar `node` y `npm`:
+   ```bash
+   node -v
+   npm -v
+   ```
+3. Instalar Expo CLI globalmente si lo deseas:
+   ```bash
+   npm install -g expo-cli
+   ```
+4. Instalar `git` si no está instalado.
+5. Instalar Android Studio y configurar un AVD.
+   - Usa un emulador Pixel 5 con Android 14 (API 34).
+   - No instales un emulador demasiado reciente, ya que puede dar problemas de compatibilidad.
+
+#### Script sugerido para Linux
+
+Crea un archivo `setup-linux.sh` y ejecútalo desde la terminal:
+
+```bash
+#!/bin/bash
+set -e
+
+echo "Instalando dependencias para TaskMaster..."
+
+sudo apt update
+sudo apt install -y curl git
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install -y nodejs
+npm install -g expo-cli
+npm install
+
+echo "Listo. Ejecuta 'npx expo start' para iniciar la app."
+```
+
+> Ajusta el script si tu distribución no usa `apt`.
+
+---
+
+## 🧪 Pasos para ejecutar el proyecto
 
 ```bash
 # 1. Clonar el repositorio
@@ -30,13 +112,36 @@ npm install
 
 # 3. Iniciar el servidor de desarrollo
 npx expo start
-
-# 4. Escanear el QR con Expo Go (Android) o la cámara (iOS)
 ```
 
-> **Alternativa:** Para correr en emulador:
-> - Android: presioná `a` en la terminal
-> - iOS: presioná `i` en la terminal
+### Abrir la app
+
+- Con Expo Go en el celular: escanea el código QR que aparece en la terminal o en la pantalla de Expo.
+- En Windows o Linux con emulador Android:
+  - Presiona `a` en la terminal para abrir Android.
+- En macOS con emulador iOS (si corresponde):
+  - Presiona `i` en la terminal.
+
+### Comandos útiles
+
+- `npm run start` — inicia Expo.
+- `npm run android` — ejecuta la app en un dispositivo/emulador Android.
+- `npm run ios` — ejecuta la app en iOS (solo macOS).
+- `npm run web` — abre la app en el navegador.
+
+---
+
+## ⚠️ Problemas comunes y soluciones
+
+- `npm install` falla:
+  - Verifica que estás usando Node 18.x.
+  - Elimina `node_modules` y vuelve a ejecutar `npm install`.
+- `expo start` no arranca:
+  - Asegúrate de tener red y permisos en el firewall.
+  - Prueba `npx expo start --tunnel` si el QR no se conecta.
+- El celular no conecta al QR:
+  - Que el celular y la PC estén en la misma red Wi-Fi.
+  - También puedes usar `localhost` o `tunnel` en la pantalla de Expo.
 
 ---
 
@@ -100,11 +205,13 @@ TaskMaster/
 
 ## 🛠 Tecnologías utilizadas
 
-- React Native 0.73
-- Expo ~50
+- Expo SDK ~50.0.0
+- React Native 0.73.6
+- React 18.2.0
+- npm 10.x (recomendado con Node 18.x)
 - React Navigation v6 (Stack)
-- AsyncStorage
-- expo-notifications
+- @react-native-async-storage/async-storage 1.21.0
+- expo-notifications ~0.27.0
 
 ---
 
