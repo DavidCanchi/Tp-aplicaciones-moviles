@@ -17,7 +17,8 @@
         "RECEIVE_BOOT_COMPLETED",
         "VIBRATE",
         "SCHEDULE_EXACT_ALARM"
-      ]
+      ],
+      "package": "com.anonymous.taskmaster"
     },
     "plugins": [
       [
