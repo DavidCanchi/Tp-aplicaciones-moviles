@@ -197,9 +197,7 @@ TaskMaster/
 
 ## 📱 Video DEMO
 
-🎬 [Ver demo en YouTube](https://youtube.com/TU_ENLACE_AQUI)
-
-> *(Reemplazar con el enlace real al subir el video)*
+🎬 [Ver demo en YouTube](https://www.youtube.com/watch?v=NLvubxI9ufM)
 
 ---
 
