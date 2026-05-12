@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { COLORS, SPACING, FONTS, RADIUS } from '../utils/theme';
 import { addTask } from '../utils/storage';
-import { scheduleTaskReminder } from '../utils/notifications';
+import { scheduleTaskReminder, requestPermissions } from '../utils/notifications';
 import CustomButton from '../components/CustomButton';
 import InputField from '../components/InputField';
 
@@ -45,27 +45,49 @@ const AddTaskScreen = ({ route, navigation }) => {
 
     setLoading(true);
 
+    // 1. Guardar tarea
     await addTask(username, {
       title: title.trim(),
       description: description.trim(),
       priority,
     });
 
-    // Schedule notification if selected
     const reminder = REMINDER_OPTIONS[reminderIndex];
+
     if (reminder.seconds) {
-      await scheduleTaskReminder(title.trim(), reminder.seconds);
-      Alert.alert(
-        '✅ Tarea guardada',
-        `Recibirás un recordatorio "${reminder.label.toLowerCase()}".`,
-        [{ text: 'OK', onPress: () => navigation.goBack() }]
-      );
+      // 2. Pedir permisos y programar notificación
+      const granted = await requestPermissions();
+
+      if (!granted) {
+        setLoading(false);
+        Alert.alert(
+          'Permisos requeridos',
+          'Necesitás habilitar las notificaciones en la configuración del dispositivo para recibir recordatorios.',
+          [{ text: 'OK', onPress: () => navigation.goBack() }]
+        );
+        return;
+      }
+
+      const notifId = await scheduleTaskReminder(title.trim(), reminder.seconds);
+      setLoading(false);
+
+      if (notifId) {
+        // 3. Navegar PRIMERO, luego mostrar el alert
+        // Así la notificación puede aparecer aunque la app esté en foreground
+        navigation.goBack();
+        setTimeout(() => {
+          Alert.alert(
+            '✅ Tarea guardada',
+            `Recordatorio programado para ${reminder.label.toLowerCase()}.`
+          );
+        }, 400);
+      } else {
+        navigation.goBack();
+      }
     } else {
       setLoading(false);
       navigation.goBack();
     }
-
-    setLoading(false);
   };
 
   return (

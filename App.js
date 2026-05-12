@@ -7,11 +7,15 @@ import { View, ActivityIndicator } from 'react-native';
 
 import { COLORS } from './utils/theme';
 import { getCurrentUser } from './utils/storage';
+import { configurarHandler, requestPermissions } from './utils/notifications';
 
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import HomeScreen from './screens/HomeScreen';
 import AddTaskScreen from './screens/AddTaskScreen';
+
+// ⚠️ Debe llamarse ANTES del primer render
+configurarHandler();
 
 const Stack = createStackNavigator();
 
@@ -20,6 +24,7 @@ export default function App() {
   const [initialParams, setInitialParams] = useState(undefined);
 
   useEffect(() => {
+    requestPermissions(); // pedir permisos al arrancar
     checkSession();
   }, []);
 
