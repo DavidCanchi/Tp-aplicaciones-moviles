@@ -58,8 +58,17 @@ export async function pedirPermisoUbicacion() {
 }
 
 export async function obtenerUbicacion() {
+  // Always request permission first so the user is prompted even when using a hardcoded location.
   const ok = await pedirPermisoUbicacion();
   if (!ok) return null;
+
+  // Hardcoded location for development (works with `npx expo start` / Expo Go)
+  const HARDCODE_LOCATION = true;
+  const HARDCODE_COORDS = { latitude: -34.8083069, longitude: -58.4835484, direccion: 'Chimondegui 980, Monte Grande' };
+  if (HARDCODE_LOCATION) {
+    return HARDCODE_COORDS;
+  }
+
   try {
     const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
     const { latitude, longitude } = loc.coords;
