@@ -16,7 +16,15 @@
       "permissions": [
         "RECEIVE_BOOT_COMPLETED",
         "VIBRATE",
-        "SCHEDULE_EXACT_ALARM"
+        "SCHEDULE_EXACT_ALARM",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "READ_CONTACTS",
+        "READ_CALENDAR",
+        "WRITE_CALENDAR"
       ],
       "package": "com.anonymous.taskmaster"
     },
@@ -26,6 +34,32 @@
         {
           "icon": "./assets/icon.png",
           "color": "#6c63ff"
+        }
+      ]
+      ,
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "TaskMaster necesita acceso a tus fotos para adjuntarlas a tareas.",
+          "cameraPermission": "TaskMaster necesita acceso a la cámara para tomar fotos de tareas."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "TaskMaster necesita tu ubicación para asociarla a una tarea."
+        }
+      ],
+      [
+        "expo-contacts",
+        {
+          "contactsPermission": "TaskMaster necesita acceso a tus contactos para asignar responsables."
+        }
+      ],
+      [
+        "expo-calendar",
+        {
+          "calendarPermission": "TaskMaster necesita acceso al calendario para crear recordatorios."
         }
       ]
     ]

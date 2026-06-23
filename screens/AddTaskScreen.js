@@ -11,8 +11,10 @@ import {
   Platform,
 } from 'react-native';
 import { COLORS, SPACING, FONTS, RADIUS } from '../utils/theme';
-import { addTask } from '../utils/storage';
+import useTaskStore from '../store/useTaskStore';
 import { scheduleTaskReminder, requestPermissions } from '../utils/notifications';
+import { tomarFoto, elegirDeGaleria, obtenerUbicacion, obtenerContactos, crearEventoCalendario } from '../utils/permisos';
+import { Image, ActivityIndicator } from 'react-native';
 import CustomButton from '../components/CustomButton';
 import InputField from '../components/InputField';
 
@@ -36,28 +38,33 @@ const AddTaskScreen = ({ route, navigation }) => {
   const [priority, setPriority] = useState('media');
   const [reminderIndex, setReminderIndex] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [imagen, setImagen] = useState(null);
+  const [ubicacion, setUbicacion] = useState(null);
+  const [contacto, setContacto] = useState(null);
+  const [loadingUbic, setLoadingUbic] = useState(false);
+
+  const { agregarTarea } = useTaskStore();
 
   const handleSave = async () => {
     if (!title.trim()) {
       Alert.alert('Error', 'El título es obligatorio.');
       return;
     }
-
     setLoading(true);
 
-    // 1. Guardar tarea
-    await addTask(username, {
+    const nueva = await agregarTarea(username, {
       title: title.trim(),
       description: description.trim(),
       priority,
+      imagen,
+      ubicacion,
+      contacto,
     });
 
     const reminder = REMINDER_OPTIONS[reminderIndex];
 
     if (reminder.seconds) {
-      // 2. Pedir permisos y programar notificación
       const granted = await requestPermissions();
-
       if (!granted) {
         setLoading(false);
         Alert.alert(
@@ -67,27 +74,54 @@ const AddTaskScreen = ({ route, navigation }) => {
         );
         return;
       }
-
       const notifId = await scheduleTaskReminder(title.trim(), reminder.seconds);
       setLoading(false);
-
+      navigation.goBack();
       if (notifId) {
-        // 3. Navegar PRIMERO, luego mostrar el alert
-        // Así la notificación puede aparecer aunque la app esté en foreground
-        navigation.goBack();
         setTimeout(() => {
-          Alert.alert(
-            '✅ Tarea guardada',
-            `Recordatorio programado para ${reminder.label.toLowerCase()}.`
-          );
+          Alert.alert('✅ Tarea guardada', `Recordatorio programado para ${reminder.label.toLowerCase()}.`);
         }, 400);
-      } else {
-        navigation.goBack();
       }
     } else {
       setLoading(false);
       navigation.goBack();
     }
+
+    // Crear evento en calendario si hay ubicación o descripción
+    if (ubicacion || description.trim()) {
+      try {
+        await crearEventoCalendario(title.trim(), new Date().toISOString(), description.trim());
+      } catch {}
+    }
+  };
+
+  const handlePhoto = () => {
+    Alert.alert('Foto adjunta', 'Elegí una fuente', [
+      { text: 'Cámara', onPress: async () => {
+        const uri = await tomarFoto();
+        if (uri) setImagen(uri);
+      }},
+      { text: 'Galería', onPress: async () => {
+        const uri = await elegirDeGaleria();
+        if (uri) setImagen(uri);
+      }},
+      { text: 'Cancelar', style: 'cancel' }
+    ]);
+  };
+
+  const handleUbicacion = async () => {
+    setLoadingUbic(true);
+    const ub = await obtenerUbicacion();
+    setLoadingUbic(false);
+    if (ub) setUbicacion(ub);
+  };
+
+  const handleContactos = async () => {
+    const list = await obtenerContactos();
+    if (!list) return;
+    const opciones = list.slice(0, 10).map((c, idx) => ({ text: c.name || `Contacto ${idx+1}`, onPress: () => setContacto({ nombre: c.name, phone: c.phoneNumbers?.[0]?.number || null }) }));
+    opciones.push({ text: 'Cancelar', style: 'cancel' });
+    Alert.alert('Seleccionar responsable', 'Elegí un contacto', opciones);
   };
 
   return (
@@ -120,6 +154,37 @@ const AddTaskScreen = ({ route, navigation }) => {
             placeholder="Detalles adicionales..."
             multiline
           />
+
+          {/* Foto adjunta */}
+          <Text style={styles.sectionLabel}>FOTO ADJUNTA</Text>
+          <View style={{ marginBottom: SPACING.sm }}>
+            <CustomButton title={imagen ? 'Cambiar foto' : 'Agregar foto'} onPress={handlePhoto} />
+            {imagen ? <Image source={{ uri: imagen }} style={{ width: '100%', height: 160, borderRadius: 6, marginTop: SPACING.sm }} /> : null}
+          </View>
+
+          {/* Ubicación */}
+          <Text style={styles.sectionLabel}>UBICACIÓN</Text>
+          <View style={{ marginBottom: SPACING.sm }}>
+            <CustomButton title={ubicacion ? 'Cambiar ubicación' : 'Agregar ubicación'} onPress={handleUbicacion} />
+            {loadingUbic && <ActivityIndicator style={{ marginTop: SPACING.sm }} />}
+            {ubicacion ? (
+              <View style={styles.infoBox}>
+                <Text>📍 {ubicacion.direccion}</Text>
+                <Text style={{ color: COLORS.textSecondary, marginTop: 4 }}>{`${ubicacion.latitude.toFixed(5)}, ${ubicacion.longitude.toFixed(5)}`}</Text>
+              </View>
+            ) : null}
+          </View>
+
+          {/* Responsable */}
+          <Text style={styles.sectionLabel}>RESPONSABLE</Text>
+          <View style={{ marginBottom: SPACING.sm }}>
+            <CustomButton title={contacto ? 'Cambiar responsable' : 'Seleccionar responsable'} onPress={handleContactos} />
+            {contacto ? (
+              <View style={styles.infoBox}>
+                <Text>👤 {contacto.nombre}</Text>
+              </View>
+            ) : null}
+          </View>
 
           {/* Priority selector */}
           <Text style={styles.sectionLabel}>PRIORIDAD</Text>

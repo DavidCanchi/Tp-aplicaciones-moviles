@@ -1,5 +1,5 @@
 // screens/HomeScreen.js
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import {
   View,
   Text,
@@ -10,26 +10,22 @@ import {
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { COLORS, SPACING, FONTS, RADIUS } from '../utils/theme';
-import { getTasks, deleteTask, toggleTask, logoutUser } from '../utils/storage';
+import { logoutUser } from '../utils/storage';
 import { requestPermissions, scheduleDailyReminder } from '../utils/notifications';
+import useTaskStore from '../store/useTaskStore';
 import TaskItem from '../components/TaskItem';
 
 const HomeScreen = ({ route, navigation }) => {
   const { username } = route.params;
-  const [tasks, setTasks] = useState([]);
+  const { tasks, cargarTareas, eliminarTarea, toggleTarea } = useTaskStore();
 
   // Reload tasks every time screen is focused
   useFocusEffect(
     useCallback(() => {
-      loadTasks();
+      cargarTareas(username);
       setupNotifications();
-    }, [])
+    }, [username])
   );
-
-  const loadTasks = async () => {
-    const data = await getTasks(username);
-    setTasks(data);
-  };
 
   const setupNotifications = async () => {
     const granted = await requestPermissions();
@@ -37,10 +33,8 @@ const HomeScreen = ({ route, navigation }) => {
       await scheduleDailyReminder();
     }
   };
-
   const handleToggle = async (taskId) => {
-    const updated = await toggleTask(username, taskId);
-    setTasks(updated);
+    await toggleTarea(username, taskId);
   };
 
   const handleDelete = (taskId) => {
@@ -53,8 +47,7 @@ const HomeScreen = ({ route, navigation }) => {
           text: 'Eliminar',
           style: 'destructive',
           onPress: async () => {
-            const updated = await deleteTask(username, taskId);
-            setTasks(updated);
+            await eliminarTarea(username, taskId);
           },
         },
       ]
@@ -123,6 +116,7 @@ const HomeScreen = ({ route, navigation }) => {
       {/* Task list */}
       <FlatList
         data={tasks}
+        extraData={done}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TaskItem task={item} onToggle={handleToggle} onDelete={handleDelete} />

@@ -1,6 +1,6 @@
 // components/TaskItem.js
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { COLORS, RADIUS, SPACING, FONTS } from '../utils/theme';
 
 const PRIORITY_COLORS = {
@@ -30,6 +30,9 @@ const TaskItem = ({ task, onToggle, onDelete }) => {
       </TouchableOpacity>
 
       <View style={styles.content}>
+        {task.imagen ? (
+          <Image source={{ uri: task.imagen }} style={{ width: '100%', height: 80, borderRadius: 6, marginBottom: 4 }} />
+        ) : null}
         <Text style={[styles.title, task.completed && styles.titleDone]} numberOfLines={2}>
           {task.title}
         </Text>
@@ -41,6 +44,14 @@ const TaskItem = ({ task, onToggle, onDelete }) => {
         <Text style={[styles.priority, { color: priorityColor }]}>
           {PRIORITY_LABELS[task.priority]}
         </Text>
+        <View style={styles.chipsRow}>
+          {task.ubicacion ? (
+            <View style={styles.chip}><Text>📍 {(task.ubicacion.direccion || '').split(',')[0]}</Text></View>
+          ) : null}
+          {task.contacto ? (
+            <View style={styles.chip}><Text>👤 {task.contacto.nombre}</Text></View>
+          ) : null}
+        </View>
       </View>
 
       <TouchableOpacity style={styles.deleteBtn} onPress={() => onDelete(task.id)} activeOpacity={0.7}>
