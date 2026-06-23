@@ -171,6 +171,24 @@ npx expo start
 
 ---
 
+## 🆕 Nuevas funcionalidades (Parcial 2)
+
+Se añadieron mejoras y funcionalidades solicitadas para la entrega Parcial 2:
+
+- **Estado global con Zustand:** se incorporó un store en `store/useTaskStore.js` para manejar tareas, usuario y persistencia con `AsyncStorage`.
+- **Módulos nativos Expo:** integración con `expo-image-picker`, `expo-location`, `expo-contacts` y `expo-calendar` para fotos, ubicación, contactos y eventos de calendario.
+- **Utilidad de permisos y APIs:** `utils/permisos.js` centraliza los pedidos de permiso y wrappers para cámara, galería, ubicación, contactos y calendario. La función solicita permisos y obtiene la ubicación del dispositivo cuando está disponible; en desarrollo el comportamiento puede ajustarse para facilitar pruebas.
+- **Alta de tarea mejorada:** la pantalla `AddTaskScreen.js` permite adjuntar foto, agregar ubicación, seleccionar responsable desde contactos y programar recordatorios. También puede crear un evento en el calendario cuando corresponde.
+- **Tests ajustados:** se agregó una suite de tests en `__tests__/taskmaster.test.js` con exactamente 3 pruebas (componentes, lógica y store). Se usa `jest-expo` y React Native Testing Library / react-test-renderer.
+- **Scripts y configuración de test:** `package.json` y la configuración de Jest fueron actualizados para ejecutar los tests con `npm test`.
+- **Comportamiento de guardado:** se mantuvo la persistencia local; la UX de recordatorios/creación de eventos puede mostrar avisos si los permisos son denegados — se recomienda revisar la lógica de permisos si se desea otra conducta.
+
+Si querés, puedo también:
+
+- Mover la verificación de permisos antes del guardado (para evitar alerts contradictorios).
+- Ejecutar `npm install` y `npx expo start` aquí para probar el flujo (necesita entorno con Android SDK/AVD o Expo Go).
+
+
 ## 🧱 Estructura del proyecto
 
 ```
